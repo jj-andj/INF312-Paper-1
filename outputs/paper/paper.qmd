@@ -1,9 +1,62 @@
 ---
-title: "My document"
-format:
-  pdf:
-    toc: true
-    number-sections: true
-    colorlinks: true
+title: "My title"
+subtitle: "My subtitle if needed"
+author: "Jayden Jung"
+thanks: "Code and data are available at: LINK."
+date: "`r format(Sys.time(), '%d %B %Y')`"
+abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+format: pdf
+nocite: '@*'
+toc: FALSE
+bibliography: references.bib
 ---
 
+```{r setup, include = FALSE}
+#### Workspace Setup ####
+library(haven)
+library(tidyverse)
+library(knitr)
+library(lubridate)
+```
+
+# Introduction
+
+The introduction should be two or three paragraphs of content. And there should be an additional final paragraph that sets out the remainder of the paper.
+
+# Data
+
+The data section should thoroughly and precisely discuss the source of the data and the bias this brings (ethical, statistical, and otherwise). Comprehensively describe and summarize the data using text, graphs, and tables. Graphs must be made with ggplot2 (Wickham 2016) and tables must be made with knitr (Xie 2022) or gt (Iannone et al. 2022). Graphs must show the actual data, or as close to it as possible, not summary statistics. Graphs and tables should be cross-referenced in the text e.g. 'Table 1 shows...').
+
+```{r}
+#### Explore ####
+setwd("/cloud/project/inputs/data")
+toronto_mci <- readr::read_csv("cleaned_data.csv", show_col_types = FALSE)
+
+#table(toronto_mci$mci_category)
+
+toronto_mci <-
+  toronto_mci %>% 
+    group_by(month = lubridate::floor_date(occurrencedate, "month")) %>% 
+    summarize("Assaults" = sum(mci_category == "Assault"))
+
+#toronto_mci <-
+ # toronto_mci %>% 
+  #  group_by(year = lubridate::floor_date(occurrencedate, "year")) %>% 
+   # summarize("Assaults" = sum(mci_category == "Assault"))
+
+toronto_mci
+
+
+
+data %>% 
+    group_by(month = lubridate::floor_date(date, "month")) %>%
+    summarize(summary_variable = sum(value))
+
+unique(toronto_mci$occurrenceyear)
+
+?year()
+```
+
+\newpage
+
+# References
