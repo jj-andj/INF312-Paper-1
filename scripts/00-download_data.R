@@ -26,11 +26,11 @@ resources <- list_package_resources("major-crime-indicators")
 
 datastore_resources <- filter(resources, tolower(format) %in% c('csv', 'geojson'))
 
-toronto_mci_data <- filter(datastore_resources, row_number()==1) %>% get_resource()
+raw_data <- filter(datastore_resources, row_number()==1) %>% get_resource()
 
 write_csv(
-  x = toronto_mci_data,
-  file = "toronto_mci_data.csv"
+  x = raw_data,
+  file = "raw_data.csv"
 )
 
-head(toronto_mci_data)
+head(raw_data)
