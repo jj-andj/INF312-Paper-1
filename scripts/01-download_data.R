@@ -1,5 +1,5 @@
 #### Preamble ####
-# Purpose: Get data on 2021 major crime indicators and make a table
+# Purpose: Get data on Toronto major crime indicators from Open Data Toronto
 # Author: Jayden Jung
 # Email: jayden.jung@mail.utoronto.ca
 # Date: 15 January 2023
@@ -9,6 +9,9 @@
 install.packages("opendatatoronto")
 install.packages("lubridate")
 install.packages("knitr")
+install.packages("tidyverse")
+install.packages("janitor")
+install.packages("here")
 
 library(knitr)
 library(janitor)
@@ -26,11 +29,13 @@ resources <- list_package_resources("major-crime-indicators")
 
 datastore_resources <- filter(resources, tolower(format) %in% c('csv', 'geojson'))
 
-raw_data <- filter(datastore_resources, row_number()==1) %>% get_resource()
+raw_data <- filter(datastore_resources, row_number()==2) %>% get_resource()
+
+path <- "inputs/data/"
 
 write_csv(
   x = raw_data,
-  file = "raw_data.csv"
+  paste(path, file = "raw_data.csv", sep = '')
 )
 
 head(raw_data)
