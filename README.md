@@ -1,4 +1,4 @@
-# INF312-Paper-1
+# Analysis on Toronto MCI Data
 
 This repo....
 
