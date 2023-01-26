@@ -13,7 +13,12 @@ bibliography: references.bib
 
 ```{r setup, include = FALSE}
 #### Workspace Setup ####
+install.packages("tinytex")
+tinytex::install_tinytex()
+
+Ylibrary(tinytex)
 library(haven)
+library(here)
 library(tidyverse)
 library(knitr)
 library(lubridate)
@@ -27,36 +32,55 @@ The introduction should be two or three paragraphs of content. And there should 
 
 The data section should thoroughly and precisely discuss the source of the data and the bias this brings (ethical, statistical, and otherwise). Comprehensively describe and summarize the data using text, graphs, and tables. Graphs must be made with ggplot2 (Wickham 2016) and tables must be made with knitr (Xie 2022) or gt (Iannone et al. 2022). Graphs must show the actual data, or as close to it as possible, not summary statistics. Graphs and tables should be cross-referenced in the text e.g. 'Table 1 shows...').
 
-```{r}
+```{r, echo=FALSE}
 #### Explore ####
-setwd("/inputs/data")
-toronto_mci <- readr::read_csv("cleaned_data.csv", show_col_types = FALSE)
+toronto_mci <- 
+  read_csv(here::here("inputs/data/cleaned_data.csv"), show_col_types = FALSE)
 
-#table(toronto_mci$mci_category)
+#names(toronto_mci)
+#unique(toronto_mci$mci_category)
+toronto_mci <- toronto_mci[order(toronto_mci$occurrencedate),]
 
-toronto_mci <-
+#head(toronto_mci)
+#tail(toronto_mci)
+
+split_data <- split(toronto_mci, f = toronto_mci$occurrenceyear)
+
+mci_2018 <- split_data$'2018'
+mci_2019 <- split_data$'2019'
+mci_2020 <- split_data$'2020'
+mci_2021 <- split_data$'2021'
+
+
+
+toronto_mci2 <-
   toronto_mci %>% 
-    group_by(month = lubridate::floor_date(occurrencedate, "month")) %>% 
-    summarize("Assaults" = sum(mci_category == "Assault"))
+    group_by(Date = lubridate::floor_date(occurrencedate, "month")) %>% 
+    summarize("Assaults" = sum(mci_category == "Assault"), 
+              "Robbery" = sum(mci_category == "Robbery"),
+              "B_and_E" = sum(mci_category == "Break and Enter"),
+              "Auto_Theft" = sum(mci_category == "Auto Theft"),
+              "Theft_Over" = sum(mci_category == "Theft Over"))
+
+toronto_mci2 %>% 
+  ggplot(aes(x = Date)) + 
+  geom_line(aes(y = Assaults), color = "red") +
+  geom_line(aes(y = Robbery), color = "blue") +
+  geom_line(aes(y = B_and_E), color = "green") +
+  geom_line(aes(y = Auto_Theft), color = "orange") +
+  geom_line(aes(y = Theft_Over), color = "purple") +
+  labs(y = "Occurences")
 
 #toronto_mci <-
  # toronto_mci %>% 
   #  group_by(year = lubridate::floor_date(occurrencedate, "year")) %>% 
    # summarize("Assaults" = sum(mci_category == "Assault"))
 
-toronto_mci
-
-
-
-data %>% 
-    group_by(month = lubridate::floor_date(date, "month")) %>%
-    summarize(summary_variable = sum(value))
-
-unique(toronto_mci$occurrenceyear)
-
-?year()
+toronto_mci2
 ```
 
 \newpage
 
 # References
+
+```{r, R.options=}
