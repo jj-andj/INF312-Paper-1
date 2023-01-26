@@ -1,5 +1,5 @@
 #### Preamble ####
-# Purpose: Get data on 2021 major crime indicators and make a table
+# Purpose: Simulate data on 2021 major crime indicators
 # Author: Jayden Jung
 # Email: jayden.jung@mail.utoronto.ca
 # Date: 15 January 2023
