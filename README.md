@@ -1,4 +1,4 @@
-# Analysis of Toronto MCI Data
+# analysis-toronto-mci
 
 This repo contains the code and data for "The Same Societal Conditions Can Impact Toronto's Major Crime Types Very Differently", an analysis of Toronto's Major Crime Indicators data. 
 
