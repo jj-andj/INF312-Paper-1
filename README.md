@@ -7,6 +7,6 @@ The data for this paper can be found on the OpenDataToronto portal.
 The repo is organized as follows:
 
 `outputs/paper/paper.qmd:` The Quarto paper file
-outputs/paper/paper.pdf: The PDF file of the paper generated using the Quarto file
-scripts: Scripts used to simulate, download, & clean the data
-inputs/data: Raw and cleaned data files written with the scripts 
+`outputs/paper/paper.pdf:` The PDF file of the paper generated using the Quarto file
+`scripts:` Scripts used to simulate, download, & clean the data
+`inputs/data:` Raw and cleaned data files written with the scripts 
