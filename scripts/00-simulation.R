@@ -1,8 +1,8 @@
 #### Preamble ####
-# Purpose: Simulate data on 2021 major crime indicators
+# Purpose: Simulate data on 2021 major crime indicator occurrences
 # Author: Jayden Jung
 # Email: jayden.jung@mail.utoronto.ca
-# Date: 15 January 2023
+# Date: Feb 3 2023
 # Prerequisites: - 
 
 #### Workspace set-up ####
@@ -45,5 +45,22 @@ simulated_mci_data <-
     )
   )
 
+#seeing what the simulated data looks like
 head(simulated_mci_data)
 tail(simulated_mci_data)
+
+
+#### Testing Simulated Data ####
+
+#testing for correct minimum date
+min(simulated_mci_data$date) == "2021-01-01"
+
+#testing for correct maximum date
+max(simulated_mci_data$date) == "2021-12-31"
+
+#testing that data has correct number of entries
+nrow(simulated_mci_data) == 365 * 3
+
+#testing for correct column types
+x <- sapply(simulated_mci_data, class)
+x[1] == "Date" && x[2] == "character" && x[3] == "character"
