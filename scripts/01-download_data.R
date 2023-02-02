@@ -22,6 +22,8 @@ library(opendatatoronto)
 library(dplyr)
 
 #### Acquire ####
+
+# Acquiring data from opendatatoronto
 package <- show_package("major-crime-indicators")
 package
 
@@ -33,6 +35,7 @@ raw_data <- filter(datastore_resources, row_number()==2) %>% get_resource()
 
 path <- "inputs/data/"
 
+# Writing raw data onto a csv 
 write_csv(
   x = raw_data,
   paste(path, file = "raw_data.csv", sep = '')

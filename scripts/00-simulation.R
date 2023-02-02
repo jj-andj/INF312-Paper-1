@@ -9,6 +9,8 @@
 install.packages("opendatatoronto")
 install.packages("lubridate")
 install.packages("knitr")
+install.packages("tidyverse")
+install.packages("janitor")
 
 library(knitr)
 library(janitor)

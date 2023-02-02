@@ -10,24 +10,24 @@ library(haven)
 library(tidyverse)
 library(janitor)
 
-raw_data <- readr::read_csv("inputs/data/raw_data.csv"
-)
+#Reading in raw data file
+raw_data <- readr::read_csv("inputs/data/raw_data.csv")
 
-#names(raw_data) 
-
+#Clean data to only include entries from 2018, 2019, 2020, 2021
 cleaned_data1 <- raw_data %>% 
   filter(occurrenceyear > 2017) %>% 
   filter(occurrenceyear < 2022)
   
+#Clean column names
 cleaned_data2 <-
   clean_names(cleaned_data1) %>% 
   select(occurrencedate, occurrenceyear, occurrencemonth, occurrenceday, 
          occurrencedayofweek, occurrencehour, mci_category, premises_type)
 
+#Remove data with NA entries
 cleaned_data_final <- na.omit(cleaned_data2)
 
-#head(cleaned_data_final)
-
+#Writing cleaned data onto csv
 path = "inputs/data/"
 write_csv(
   x = cleaned_data_final,
