@@ -1,4 +1,4 @@
-# Analysis on Toronto MCI Data
+# Analysis of Toronto MCI Data
 
 This repo....
 
