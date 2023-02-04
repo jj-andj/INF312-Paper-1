@@ -1,86 +1,295 @@
 ---
-title: "My title"
-subtitle: "My subtitle if needed"
+title: "The Same Societal Conditions Can Impact Toronto's Types of Major Crime Very Differently"
 author: "Jayden Jung"
-thanks: "Code and data are available at: LINK."
-date: "`r format(Sys.time(), '%d %B %Y')`"
-abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
-format: pdf
+thanks: "Code and data are available at: https://github.com/jj-andj/analysis-toronto-mci"
+date: "February 3, 2023"
+date-format: long
+format: 
+  pdf: 
+    documentclass: article
+    geometry: margin = 1in
+    abstract: "Measurements of crime is often used to inform vital policies, and even to indicate the quality of a society itself. This paper draws upon Toronto's recorded Major Crime Indicators in recent years and cross references the observations with secondary research on varieties of societal circumstances and events. We find that one instance of a societal condition can affect different types of crime in nuanced ways. A certain event may increase the rate of one crime type while simultaenously decreasing another, for example. Policies intended to decrease crime should be conscious of this, ensure careful approaches that do not yield unintentional adverse effects, and try to better understand the root of different crimes."
+output: 
+  bookdown::pdf_document2
+toc: false
+fig_caption: yes
 nocite: '@*'
-toc: FALSE
 bibliography: references.bib
+header-includes: \definecolor{ltgray}{HTML}{EFEFEF}
 ---
 
-```{r setup, include = FALSE}
+```{r setup, include=FALSE, echo=FALSE, warnign=FALSE, message=FALSE}
 #### Workspace Setup ####
-install.packages("tinytex")
-tinytex::install_tinytex()
+#install.packages("tinytex")
+#tinytex::install_tinytex()
+#install.packages("kableExtra")
+#install.packages("bookdown")
 
-Ylibrary(tinytex)
-library(haven)
+library(bookdown)
+library(tinytex)
 library(here)
 library(tidyverse)
 library(knitr)
+library(kableExtra)
 library(lubridate)
 ```
 
 # Introduction
 
-The introduction should be two or three paragraphs of content. And there should be an additional final paragraph that sets out the remainder of the paper.
+> "Crime is a symptom of a diseased society."
+>
+> --- Alexandria Ocasio-Cortez, New York City Congresswoman, 2020.
+
+As the quote above [@citeAOCtweet] claims, crime rate is often considered as a measurable indicator of the quality of a societal organization, as there is a meaningful relationship between the two. Some claim that crime is a problem on its own that negatively affects society, and that policies that aim at directly lowering crime will improve society, but this is a mistaken allocation of responsibility, as it wrongly suggests that crime exist without the definite influences of the society it occurs in. Crime is much more symptom-like in nature than this, and seeing data on it can be useful to infer the state of society in given scenarios.
+
+Data on crime can and should be analyzed carefully to inform how a society can be organized better. This paper proposes many ways of visually representing this information with varying axes, specifically with data on Toronto's major crimes in recent years (2018-2021). Insights from these illustrations of data are looked at alongside secondary resources regarding what was happening at the time in Toronto, Canada, and the world, and connections are drawn where they can be seen. It is found that crime very much fluctuates according to ongoing societal circumstances, and specific crime types are affected very differently by the same events. These conclusions will hopefully mobilize more conscious and intentional consideration of using crime rates to inform policy, facilitating the movement towards more thorough investigation on the sources of crime and how they can be mitigated.
+
+This paper first considers how crime varies across the months of the year, days of the week, and times of day, showing that, while there are general trends that apply to all crime types, there is more nuance in specific crime types' trends. Similar points are then made about how, though one crime might be more prevalent overall, looking at specific types of premises for their occurrence may reveal more about its severity.
+
+After, the paper delves into how general monthly crime rates have fluctuated over the years, mainly relative to the COVID-19 pandemic persisting through 2020 and 2021. Finally, it is shown that specific crime types have been affected very differently over the same course of time, some decreasing while others increased as the pandemic went on.
+
+The analysis in this paper is done by using `R` [@citeR] and packages like `dplyr` [@citeDplyr], `knitr` [@citeKnit], `tidyverse` [@citeTidy], `bookdown` [@citeBook], `janitor` [@citeJan], and `lubridate` [@citeLub]. Figures are generated with `ggplot` [@citegg] and `kableExtra` [@citeKex], for graphs and tables respectively.
 
 # Data
 
-The data section should thoroughly and precisely discuss the source of the data and the bias this brings (ethical, statistical, and otherwise). Comprehensively describe and summarize the data using text, graphs, and tables. Graphs must be made with ggplot2 (Wickham 2016) and tables must be made with knitr (Xie 2022) or gt (Iannone et al. 2022). Graphs must show the actual data, or as close to it as possible, not summary statistics. Graphs and tables should be cross-referenced in the text e.g. 'Table 1 shows...').
+## Source, Data Collection, & Cleaning
 
-```{r, echo=FALSE}
-#### Explore ####
+This paper uses data from @citeDataset as read in from the City of Toronto's Open Data Portal, which was accessed with `R` and the package `opendatatoronto` by @citeTO.
+
+This data set is comprised of Major Crime Indicator (MCI) occurrences in Toronto. This was chosen over other available options on `opendatatoronto` because it is comparably very well organized and complete, as well as encompassing multiple categories of major crime that make up commonly used crime statistics. Other data sets are often too specific, focusing on one type of crime. Using this one allowed this paper to make comparisons across different crime types will operating on a single data set. The MCI categories recorded are Assault, Break and Enter (B&E), Auto Theft, Robbery, and Theft Over \$5000 (referred to as Theft Over). Sexual assaults are not part of this data set.
+
+This data represents MCI occurrences that were reported to the Toronto Police and been considered founded, meaning that it only includes instances that were investigated and deemed that the reported offence occurred [@citeDataset]. It should be noted that there may be discrepancy in reported and founded occurrences and unreported or wrongly unfounded ones. There is a notable history of police reports not being entirely reflective of the reality of crime present in a society. For example, people of marginalized communities justifiably are weary of reporting to the police out of fear that they may be harmed. This paper does not aim to ignore these aspects, but does use the large data set that is available to try to derive general insights about crime trends.
+
+Each entry includes information on both the occurrence itself (the MCI category, date, year, month, day, day of week, time, type of premise) and the reporting of the occurrence (date, year, month, day, day of week, and time), and there is additional information regarding a unique event ID, police division where the offence occurred, identifier and name of the neighborhood it occurred in, and longitude and latitude coordinates if available [@citePolice]. As this paper focuses solely on the actual occurrences, the reporting data was not used. Very specific location data was not used, either, as there were many empty entries and it would not have yielded complete analysis.
+
+This information is provided by the Toronto Police Services and is updated semi-annually. Though there is data ranging from occurrences reported from 2014 until mid-2022, this paper narrows in only on data on occurrences that occurred between 2018 and 2021 both to focus on more recent, applicable data, and to ensure completeness of data. First, some reports made in recent years actually refer to occurrences that occurred many years ago, earliest in the entry being 1966. Because of this, there are many older years that have very incomplete data, so we set the lower limit to 2018. Though there is 2022 data, at the time of this paper, there is only information for up until June, making it incomplete. Such, we set our upper limit to 2021. Other than the date-related information for the occurrences, we only included the MCI category and premise type (one of Apartment, House, Outside, Commercial, Educational, Transit, and Other) for the purposes of this paper.
+
+```{r initialimport , echo=FALSE, warning=FALSE, message=FALSE}
+
+#reading in data from inputs
 toronto_mci <- 
   read_csv(here::here("inputs/data/cleaned_data.csv"), show_col_types = FALSE)
 
-#names(toronto_mci)
-#unique(toronto_mci$mci_category)
 toronto_mci <- toronto_mci[order(toronto_mci$occurrencedate),]
+```
 
-#head(toronto_mci)
-#tail(toronto_mci)
+## Observations & Analyses
 
-split_data <- split(toronto_mci, f = toronto_mci$occurrenceyear)
+What about @fig-dow and @fig-tod and @fig-premise
 
-mci_2018 <- split_data$'2018'
-mci_2019 <- split_data$'2019'
-mci_2020 <- split_data$'2020'
-mci_2021 <- split_data$'2021'
+This paper first considers how crime varies across the months of the year, days of the week, and times of day, showing that, while there are general trends that apply to all crime types, there is more nuance in specific crime types' trends. Similar points are then made about how, though one crime might be more prevalent overall, looking at specific types of premises for their occurrence may reveal more about its severity.
 
+```{r Days of Week Trends}
+#| label: fig-dow
+#| fig-cap: Crime occurrences by day of week.
+#| echo: false
+#| warning: false
+#| message: false
+#| fig.align: 'center'
 
+#filtering for data on occurrence day of week and mci category of occurrence
+dow_mci <- data.frame(table(toronto_mci$"occurrencedayofweek", 
+                            toronto_mci$mci_category))
 
-toronto_mci2 <-
+#renaming columns
+colnames(dow_mci) <- c("day_of_week", "mci_category", "occurrences")
+
+#plotting data to show occurrence amount per day of the week with distinction on given MCI type
+dow_mci %>% 
+  ggplot(aes(x = reorder(day_of_week, occurrences, sum, 
+                         decreasing = TRUE), 
+             y = occurrences, 
+             fill = mci_category)) +
+  geom_col(width = 0.8) +
+  theme_minimal() +
+  labs(x = "Day of Week", y = "Major CrimeOccurrences", fill = "MCI Category") + 
+  scale_fill_brewer(palette="Dark2") + 
+  theme(axis.text = element_text(size = 7)) + 
+  theme(text=element_text(size=11, family="serif")) +
+  ggtitle("Crime is highest in the latter half of the week") 
+
+```
+
+```{r Time of Day Trends}
+#| label: fig-tod
+#| fig-cap: Crime occurrences by time of day.
+#| echo: FALSE
+#| fig.align: 'center'
+
+#filtering data for information on occurrence hour and MCI category
+tod_mci <- data.frame(table(toronto_mci$"occurrencehour", 
+                            toronto_mci$mci_category))
+
+#renaming columns
+colnames(tod_mci) <- c("time_of_day", "mci_category", "occurrences")
+
+#plotting data to show occurrence amount per hour of the day with distinction on which MCI type it belongs to
+tod_mci %>% 
+  ggplot(aes(x = time_of_day, 
+             y = occurrences, 
+             fill = mci_category)) +
+  geom_col(width = 0.9) +
+  labs(x = "Time of Day (Hour)", y = "Major Crime Occurrences", fill = "MCI Category") + 
+  theme_minimal() +
+  scale_fill_brewer(palette="Dark2") + 
+  theme(axis.text = element_text(size = 7)) + 
+  theme(legend.position="bottom") + 
+  theme(text=element_text(size=11, family="serif")) + 
+  theme(legend.title = element_text(size = 8),
+        legend.text = element_text(size = 7.5)) + 
+  ggtitle("Crime spikes at 12pm (noon) and 6pm onwards")
+
+```
+
+```{r ByPremise}
+#| label: fig-premise
+#| fig-cap: Crime occurrences at different premise types by MCI type
+#| echo: FALSE
+#| fig.align: 'center'
+#| warning: false
+
+#filtering data for information on the type of premise that the occurrence happened at and its MCI category
+premise_data <- data.frame(table(toronto_mci$premises_type, 
+                            toronto_mci$mci_category))
+
+#renaming columns
+colnames(premise_data) <- c("premise_type", "mci_category", "occurrences")
+            
+#plot data on number of total occurrences by MCI category with distinction on what premises it occurred on
+premise_data %>% 
+  ggplot(aes(x = reorder(mci_category, occurrences, sum, decreasing = TRUE), 
+             y = occurrences, fill = premise_type)) +
+  geom_col() + 
+  theme_minimal() + 
+  theme(legend.position="bottom") + 
+  theme(legend.title = element_text(size = 9),
+        legend.text = element_text(size = 8.5)) +
+  labs(x = "MCI Types in order of most to least crime", 
+       y = "Major Crime Occurrences",
+       fill = "Premise Type") + 
+  ggtitle("") + 
+  theme(text=element_text(size=11, family="serif")) 
+
+```
+
+After, the paper delves into how general monthly crime rates have fluctuated over the years, mainly relative to the COVID-19 pandemic persisting through 2020 and 2021. Finally, it is shown that specific crime types have been affected very differently over the same course of time, some decreasing while others increased as the pandemic went on.
+
+Look at @tbl-by-year or you can see @fig-by-year
+
+Also @fig-mci-type
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| echo: false
+#| label: tbl-by-year
+#| tbl-cap: "Crime per month over the years"
+library(janitor)
+library(knitr)
+library(kableExtra)
+
+#reading in data
+by_year <- toronto_mci
+
+#factoring to order month names correctly
+by_year$occurrencemonth <- 
+  factor(by_year$occurrencemonth, levels = month.name) 
+
+#summarizing number of occurrences per month for every year
+by_year <-
+  by_year %>% 
+    group_by("Month" = occurrencemonth) %>% 
+    summarize("2018" = sum(occurrenceyear == 2018), 
+              "2019" = sum(occurrenceyear == 2019), 
+              "2020" = sum(occurrenceyear == 2020), 
+              "2021" = sum(occurrenceyear == 2021))
+
+#making a table that shows number of occurrences per month per year
+by_year %>% 
+  adorn_totals("row") %>% 
+  knitr::kable(booktabs = TRUE, linesep = "") %>% 
+  kable_styling(latex_options = "striped", 
+                stripe_color = "ltgray") %>% 
+  column_spec(1,width = "1in") %>%
+  column_spec(2,width = "0.7in") %>%
+  column_spec(3,width = "0.7in") %>%
+  column_spec(4,width = "0.7in") %>%
+  column_spec(5,width = "0.7in") %>%
+  row_spec(0,bold=TRUE) %>% 
+  row_spec(13,bold=T) %>% 
+  row_spec(12, hline_after = T)
+
+```
+
+```{r}
+#| label: fig-by-year
+#| fig-cap: "Comparing monthly crime occurrences over the years"
+#| echo: false
+#| warning: false
+#| fig.aling: 'center'
+
+#using the data frame from tbl-by-year, but renaming the months to numeric
+by_year$Month <- 1:nrow(by_year)
+
+#ensuring that the year columns are in character type for plotting
+names(by_year)[2:5] <- as.character(names(by_year)[2:5])
+
+#gathering the data across different year columns into given three columns for plotting
+by_year <- gather(by_year, key = measure, value = Rate, 
+c("2018", "2019", "2020", "2021"))
+
+#renaming columns
+colnames(by_year) <- c("Month", "Year", "Occurrences")
+
+#plotting data to compare crime rate throughout the year over multiple years
+by_year %>% 
+  ggplot(aes(x = Month, y = Occurrences, 
+             group = Year, colour = Year)) +
+  geom_line() + 
+  theme(axis.text.x = element_blank()) + 
+  theme_minimal() + 
+  scale_x_continuous(breaks = by_year$Month) + 
+  labs(y = "Major Crime Occurrences", x = "Months", colour = "Year") + 
+  theme(text=element_text(size=11, family="serif")) +
+  ggtitle("Overall Major Crime was rising greatly until COVID-19.")
+
+```
+
+```{r}
+#| label: fig-mci-type
+#| fig-cap: Different MCI type crime occurrences over time.
+#| echo: FALSE
+#| fig.align: 'center'
+
+#reading in relevant data, lubridating dates, summarizing monthly occurrences by mci type
+by_mci <-
   toronto_mci %>% 
     group_by(Date = lubridate::floor_date(occurrencedate, "month")) %>% 
     summarize("Assaults" = sum(mci_category == "Assault"), 
               "Robbery" = sum(mci_category == "Robbery"),
-              "B_and_E" = sum(mci_category == "Break and Enter"),
-              "Auto_Theft" = sum(mci_category == "Auto Theft"),
-              "Theft_Over" = sum(mci_category == "Theft Over"))
+              "Breaking and Entering" = sum(mci_category == "Break and Enter"),
+              "Auto Theft" = sum(mci_category == "Auto Theft"),
+              "Theft Over" = sum(mci_category == "Theft Over"))
 
-toronto_mci2 %>% 
-  ggplot(aes(x = Date)) + 
-  geom_line(aes(y = Assaults), color = "red") +
-  geom_line(aes(y = Robbery), color = "blue") +
-  geom_line(aes(y = B_and_E), color = "green") +
-  geom_line(aes(y = Auto_Theft), color = "orange") +
-  geom_line(aes(y = Theft_Over), color = "purple") +
-  labs(y = "Occurences")
+#gathering all mci type columns into one for plotting
+by_mci <- gather(by_mci, key = measure, value = Rate, 
+c("Assaults", "Robbery", "Breaking and Entering", "Auto Theft", "Theft Over"))
 
-#toronto_mci <-
- # toronto_mci %>% 
-  #  group_by(year = lubridate::floor_date(occurrencedate, "year")) %>% 
-   # summarize("Assaults" = sum(mci_category == "Assault"))
+#renaming columns
+colnames(by_mci) <- c("Date", "MCI", "Occurrences")
 
-toronto_mci2
+#plotting data to show trend of occurrences for different mci types over the years
+by_mci %>% 
+  ggplot(aes(x = Date, y = Occurrences, 
+             group = MCI, colour = MCI)) +
+  geom_line() + 
+  theme_minimal() + 
+  labs(y = "Occurrences", x = "Date", colour = "MCI Type") + 
+  theme(legend.position="bottom") + 
+  theme(legend.title = element_text(size = 8),
+        legend.text = element_text(size = 7.5)) +  
+  theme(text=element_text(size=11, family="serif")) +
+  ggtitle("All Crime dipped with COVID-19, except Auto Theft")
 ```
 
-\newpage
+\clearpage
 
 # References
-
-```{r, R.options=}
