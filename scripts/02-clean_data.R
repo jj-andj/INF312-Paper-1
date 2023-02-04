@@ -6,7 +6,6 @@
 # Prerequisites: have downloaded raw_data.csv from inputs/data 
 
 #### Workspace set-up ####
-library(haven)
 library(tidyverse)
 library(janitor)
 
