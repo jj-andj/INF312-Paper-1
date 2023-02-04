@@ -1,6 +1,6 @@
 # Analysis on Toronto Major Crime Indicator Data
 
-This repo contains the code and data for "The Same Societal Conditions Can Impact Toronto's Major Crime Types Very Differently", an analysis of Toronto's Major Crime Indicators data. 
+This repo contains the code and data for "The Same Societal Conditions Can Impact Toronto’s Types of Major Crime Very Differently∗", an analysis of Toronto's Major Crime Indicators data. 
 
 The data for this paper can be found on the OpenDataToronto portal. 
 
