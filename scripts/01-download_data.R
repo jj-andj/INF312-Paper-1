@@ -13,9 +13,7 @@ install.packages("tidyverse")
 install.packages("janitor")
 install.packages("here")
 
-library(knitr)
 library(janitor)
-library(lubridate)
 library(tidyverse)
 
 library(opendatatoronto)
@@ -41,4 +39,4 @@ write_csv(
   paste(path, file = "raw_data.csv", sep = '')
 )
 
-head(raw_data)
+head(raw_data) 
