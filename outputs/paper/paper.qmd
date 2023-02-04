@@ -54,15 +54,15 @@ The analysis in this paper is done by using `R` [@citeR] and packages like `dply
 
 ## Source, Data Collection, & Cleaning
 
-This paper uses data from @citeDataset as read in from the City of Toronto's Open Data Portal, which was accessed with `R` and the package `opendatatoronto` by @citeTO.
+This paper uses data from @citeDataset as read in from the City of Toronto's Open Data Portal, which was accessed with `R` and the package `opendatatoronto` by @citeTO. This data set is comprised of Major Crime Indicator (MCI) occurrences in Toronto. This was chosen over other available options on `opendatatoronto` because it is comparably very well organized and complete and encompasses multiple categories of major crime. Other data sets are often too specific, focusing on one type of crime. Using this one allowed this paper to make comparisons across different crime types will operating on a single data set.
 
-This data set is comprised of Major Crime Indicator (MCI) occurrences in Toronto. This was chosen over other available options on `opendatatoronto` because it is comparably very well organized and complete, as well as encompassing multiple categories of major crime that make up commonly used crime statistics. Other data sets are often too specific, focusing on one type of crime. Using this one allowed this paper to make comparisons across different crime types will operating on a single data set. The MCI categories recorded are Assault, Break and Enter (B&E), Auto Theft, Robbery, and Theft Over \$5000 (referred to as Theft Over). Sexual assaults are not part of this data set.
+The MCI categories recorded are: Assault, Break and Enter (B&E), Auto Theft, Robbery, and Theft Over \$5000 (referred to as Theft Over). Sexual assaults are not part of this data set.
 
 This data represents MCI occurrences that were reported to the Toronto Police and been considered founded, meaning that it only includes instances that were investigated and deemed that the reported offence occurred [@citeDataset]. It should be noted that there may be discrepancy in reported and founded occurrences and unreported or wrongly unfounded ones. There is a notable history of police reports not being entirely reflective of the reality of crime present in a society. For example, people of marginalized communities justifiably are weary of reporting to the police out of fear that they may be harmed. This paper does not aim to ignore these aspects, but does use the large data set that is available to try to derive general insights about crime trends.
 
 Each entry includes information on both the occurrence itself (the MCI category, date, year, month, day, day of week, time, type of premise) and the reporting of the occurrence (date, year, month, day, day of week, and time), and there is additional information regarding a unique event ID, police division where the offence occurred, identifier and name of the neighborhood it occurred in, and longitude and latitude coordinates if available [@citePolice]. As this paper focuses solely on the actual occurrences, the reporting data was not used. Very specific location data was not used, either, as there were many empty entries and it would not have yielded complete analysis.
 
-This information is provided by the Toronto Police Services and is updated semi-annually. Though there is data ranging from occurrences reported from 2014 until mid-2022, this paper narrows in only on data on occurrences that occurred between 2018 and 2021 both to focus on more recent, applicable data, and to ensure completeness of data. First, some reports made in recent years actually refer to occurrences that occurred many years ago, earliest in the entry being 1966. Because of this, there are many older years that have very incomplete data, so we set the lower limit to 2018. Though there is 2022 data, at the time of this paper, there is only information for up until June, making it incomplete. Such, we set our upper limit to 2021. Other than the date-related information for the occurrences, we only included the MCI category and premise type (one of Apartment, House, Outside, Commercial, Educational, Transit, and Other) for the purposes of this paper.
+This information is provided by the Toronto Police Services and is updated semi-annually. Though there is data ranging from occurrences reported from 2014 until mid-2022, this paper narrows in only on data on occurrences that occurred between 2018 and 2021 both to focus on more recent data and to ensure completeness of the data. First, some reports made in recent years actually refer to occurrences that occurred many years ago, earliest in the entry being 1966. There are many older years that have very incomplete data, so we set the lower limit to 2018. Though there is 2022 data, at the time of this paper, there is only information for up until June, making it incomplete. Such, we set our upper limit to 2021. Other than the date-related information for the occurrences, we only included the MCI category and premise type (one of Apartment, House, Outside, Commercial, Educational, Transit, and Other) for the purposes of this paper.
 
 ```{r initialimport , echo=FALSE, warning=FALSE, message=FALSE}
 
@@ -75,9 +75,9 @@ toronto_mci <- toronto_mci[order(toronto_mci$occurrencedate),]
 
 ## Observations & Analyses
 
-What about @fig-dow and @fig-tod and @fig-premise
+The data set for analysis had the columns for Occurrence Date, Year, Month, Day, Day of the Week, Hour of the day, the MCI Category, and Premise type. After cleaning for data between 2018-2021 and omitting rows with N/A, we were working with 136,680 entries. Much of the analysis uses the date-related information and MCI category to identify trends over time.
 
-This paper first considers how crime varies across the months of the year, days of the week, and times of day, showing that, while there are general trends that apply to all crime types, there is more nuance in specific crime types' trends. Similar points are then made about how, though one crime might be more prevalent overall, looking at specific types of premises for their occurrence may reveal more about its severity.
+@fig-dow shows all MCI occurrences in the four year range by day of the week that the incident occurred, and @fig-tod does the same by time of day.
 
 ```{r Days of Week Trends}
 #| label: fig-dow
@@ -137,9 +137,15 @@ tod_mci %>%
   theme(text=element_text(size=11, family="serif")) + 
   theme(legend.title = element_text(size = 8),
         legend.text = element_text(size = 7.5)) + 
-  ggtitle("Crime spikes at 12pm (noon) and 6pm onwards")
+  ggtitle("Crime spikes at 12pm (noon) and 6pm until 11pm/Midnight")
 
 ```
+
+These figures illustrate that crime is generally higher on the latter half of the week (Wednesday, Thursday, Friday, Saturday) and in the late evening (6pm - 12am). Sundays have the least crime in a week, and 3 am - 9 am sees less crime. Crime doesn't fluctuate a greatly noticeable amount between different days of the week, but it does for hours in a day, the peaks being almost triple the height of the lowest point (6 am). These findings seemingly follow common assumptions that the weekend and the night is more dangerous, though we see that this is not so true the later it gets in the day (1 am onward).
+
+@fig-dow and @fig-tod breaks down each count by the MCI categories. Assaults definitely take up a majority, and there is usually a pretty even proportion throughout each category at different times. One large outlier, though, is that crime greatly spikes in the middle of the day at 12pm. This is the point in the day that has the highest rate of Theft Over and relatively high counts of B&E. Though this time is not so distinct from the other times with high numbers of overall crime (i.e. 6pm-12am), it stands out in over representing these certain MCI types.
+
+On a similar note @fig-premise illustrates the total number of crime by MCI category type with distinction on what the premise types the occurrences happened at, and here also we see that, looking beyond the general trends, we can analyze over representation of certain MCI-types for certain premise types.
 
 ```{r ByPremise}
 #| label: fig-premise
@@ -159,7 +165,7 @@ colnames(premise_data) <- c("premise_type", "mci_category", "occurrences")
 premise_data %>% 
   ggplot(aes(x = reorder(mci_category, occurrences, sum, decreasing = TRUE), 
              y = occurrences, fill = premise_type)) +
-  geom_col() + 
+  geom_col(position="dodge") + 
   theme_minimal() + 
   theme(legend.position="bottom") + 
   theme(legend.title = element_text(size = 9),
@@ -168,15 +174,20 @@ premise_data %>%
        y = "Major Crime Occurrences",
        fill = "Premise Type") + 
   ggtitle("") + 
-  theme(text=element_text(size=11, family="serif")) 
+  theme(text=element_text(size=11, family="serif")) + 
+  ggtitle("Crime types are often location-contingent.")
 
 ```
 
-After, the paper delves into how general monthly crime rates have fluctuated over the years, mainly relative to the COVID-19 pandemic persisting through 2020 and 2021. Finally, it is shown that specific crime types have been affected very differently over the same course of time, some decreasing while others increased as the pandemic went on.
+For example, Assault is the highest occurring crime overall, and it is a crime that can occur at every premise type. B&E cannot happen or is very unlikely to happen Outside or on Transit, as the nature of the crime is breaking into restricted or private areas. Considering this, even though B&E occurs much less than assault overall, it occurs on Commercial and House premises as much as if not more than Assault does. This is a more accurate understanding of interpreting these crime rates.
 
-Look at @tbl-by-year or you can see @fig-by-year
+This analysis can also be applied to Auto Theft, a crime that can only realistically occur Outside or in front of a House, and possibly in a Commercial parking garage. With this in mind, we again see how common auto theft is, being comparable to the amount of Assault and B&E that occurs at houses, and noticeably taking up a lot of the crime that occurs outdoors.
 
-Also @fig-mci-type
+These points exemplify that we should look much closer at crime rate data to gain actually meaningful, accurate insights from it, instead of generalizing all major crime into one measurement.
+
+\clearpage
+
+@tbl-by-year shows the exact record of total MCI occurrences per month over the years, while @fig-by-year plots this information for more general comparison.
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 #| echo: false
@@ -208,6 +219,7 @@ by_year %>%
   knitr::kable(booktabs = TRUE, linesep = "") %>% 
   kable_styling(latex_options = "striped", 
                 stripe_color = "ltgray") %>% 
+  kable_styling(latex_options = "HOLD_position") %>% 
   column_spec(1,width = "1in") %>%
   column_spec(2,width = "0.7in") %>%
   column_spec(3,width = "0.7in") %>%
@@ -253,6 +265,12 @@ by_year %>%
 
 ```
 
+Looking at either, it is noticeable that crime rates were greatly increasing through 2018 and 2019, though there are the regular month-related fluctuations (more crime in the summer and October, less otherwise). 2018 had a total occurrence count of 34,955, and then 2019 lead with thousands more at 37,196. Both had the most crime recorded in October at 3,104 and 3,451 occurrences respectively. This is supported by news coverage of the time, as stories arose discussing that the average Canadian felt that they were perceiving more and more crime during this period [@citeConfidence].
+
+We see in early 2020 that this was continuing, as January, February, and March of that year saw noticeably more crime than the two previous years. Then, April shows a stark, unprecedented dip in overall crime, recording at \~700 less occurrences than the same month the year before in 2019. This persisted in May 2020 that had an even larger contrast with \~900 less occurrences than 2019. This coincides with the beginning of the COVID-19 pandemic, as Ontario instated social distancing and lock-down measures throughout these months, limiting societal activity in general [@citeMarch]. Crime begins to rise again in the summer of 2020 as Ontario began their reopening plan [@citeSept], and then declined again from September onward as this initiative was put on pause. Then, we see the lowest number of crime occurrences in early 2021 (most noticeably February with \~2,000 occurrences, aligning with the strictest Ontario lockdown in these months where all non-essential businesses were shut down [@citeDec]. As this lock-down loosened later in the year (May onward), crime rate also began increasing, though it had not reached its heights of 2019. The highest crime rate month in 2021, also October, was still \~400 less than 2019.
+
+This analysis has shown that the holistic crime rate fluctuated greatly in accordance with COVID-19-related circumstances. Now, though, looking deeper into how occurrence trends look for specific MCI types, we turn to @fig-mci-type. This graph shows the number of monthly occurrences over the years but broken down to each MCI type. Unlike @fig-by-year, which overlaps each year on top of each other to see direct comparisons by month, @fig-mci-type uses a linear timeline of months from January 2018 until December 2021 as the x-axis. By doing so and overlaying the occurrence counts for each MCI type, we can see the long-term trends that they've followed and compare them against each other.
+
 ```{r}
 #| label: fig-mci-type
 #| fig-cap: Different MCI type crime occurrences over time.
@@ -289,6 +307,14 @@ by_mci %>%
   theme(text=element_text(size=11, family="serif")) +
   ggtitle("All Crime dipped with COVID-19, except Auto Theft")
 ```
+
+The most noticeable visual point is the major dip in Assaults in the first third of 2020, in line with the overall trends in @fig-by-year and @tbl-by-year. Looking closer, we see that this also happened with Breaking and Entering (B&E) and Robbery, and very slightly for Theft Over. What is interesting here is that Auto Theft is the one MCI category that was unaffected by this initial COVID dip. In fact, @fig-mci-type shows that it increased through 2020, clearly beating out its 2018 and 2019 numbers. Even Assault, which did see a major recovery in rate in mid-2020, did not surpass its peak from 2019. Auto Theft continued to rise, and, in late 2021, hit the highest monthly records seen in all four years.
+
+Researching current events records at the time yields that lock down measures had led, at the time, to car manufacturers shutting down, stiffening the supply of available cars on the market [@citeCar]. This, coupled with the constant demand for cars and car parts, meant that car prices went through a major increase, creating more incentive for Auto Theft. While COVID-19 lock downs may have brought major crimes overall, it indirectly affected the specific category of Auto Thefts by causing an imbalance in the car market. This effect persisted into an ongoing crisis of the proliferation of Auto Theft.
+
+If we were to have only looked at general crime rates as we did in @tbl-by-year and @fig-by-year without the application of @fig-mci-type, we may have arrived at an incomplete understanding that COVID-19 decreased all major crime. Only by dividing out our analysis by MCI type are we able to notice these details.
+
+With the aim of bettering our society, and thus seeking policies that reduce crime, data on the topic should be used as a measure of ongoing circumstances. Beyond that, this paper has shown that simply looking at an overall crime rate is likely not enough in such an important context, and has exemplified that in multiple cases. The available data on crime occurrences can be very helpful to gain insights from and inform the way our society is organized, and so it should be treated with nuanced approaches that do not wrongfully overgeneralize the information.
 
 \clearpage
 
